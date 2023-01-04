@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css" />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+    </style>
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+    <script src="assets/script/api-new.js"></script>
+    <script src="assets/script/api.js"></script>
+    <script>
+      setTimeout(DirectOnGuest, 500);
+      setTimeout(ShowName, 800);
+      setTimeout(ApplyHistory, 800);
+    </script>
+    <script src="assets/script/tailwind-config.js"></script>
+  </head>
+  <body class="font-poppins">
+    <nav class="mb-4 bg-white text-gray-900 shadow-md">
+      <div class="flex flex-row items-center justify-between px-16">
+        <div>
+          <p class="font-bold text-xl" id="hi-username"></p>
+        </div>
+        <div>
+          <ul class="flex flex-wrap -mb-px text-sm font-medium text-center place-content-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
+            <li class="mr-2 text-lg" role="presentation">
+              <a href="index.html" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-700 hover:border-blue-700 dark:hover:text-blue-700" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Home</a>
+            </li>
+            <li class="mr-2 text-lg" role="presentation">
+              <a class="inline-block p-4 rounded-t-lg border-b-2 border-blue-700" href="#" id="home-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">History</a>
+            </li>
+            <li class="mr-2 text-lg" role="presentation">
+              <a href="predict.html" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-blue-700 hover:border-blue-700 dark:hover:text-blue-700" id="predict-tab" data-tabs-target="#predict" type="button" role="tab" aria-controls="profile" aria-selected="false">Predict</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div class="relative w-64 h-10 px-4"></div>
+        </div>
+      </div>
+    </nav>
+    <div class="ml-12 mt-12 flex flex-row">
+      <div class="w-[60%]">
+        <p class="font-bold text-2xl">Rating History</p>
+
+        <div id="history-list"></div>
+
+      </div>
+    </div>
+  </body>
+</html>
