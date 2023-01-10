@@ -57,6 +57,7 @@ async function ApplyListFilm() {
 
   const movies = data.data.recommendations;
   const html = movies.map(movie => {
+    const rev = Number.parseInt(movie.relevancy * 100);
     return `
       <div class="w-4/5 max-w-xs rounded-lg border-solid border-2 shadow-md my-3 p-2">
           <div class="h-[360px] overflow-hidden"  alt="${movie.title}">
@@ -74,13 +75,17 @@ async function ApplyListFilm() {
               </div>
           
               <div class="flex flex-row items-center mt-2">
-                  <p class="font-semibold">Given Rating: </p>
-                  <p class="ml-1 text-gray-700">${movie.rating.given || '-'}</p>
+                  <!--<p class="font-semibold">Given Rating: </p>
+                  <p class="ml-1 text-gray-700">${movie.rating.given || '-'}</p>-->
+              </div>
+              <div class="flex flex-row items-center mt-2">
+                  <p class="font-semibold">Relevancy: </p>
+                  <p class="ml-1 text-gray-700">${Number.isNaN(rev) ? '?' : rev}%</p>
               </div>
               <div class="flex flex-row items-center mt-2" id="div-rate-${movie.film_id}">
-                  <p class="font-semibold">Predict Rating: </p>
+                  <!--<p class="font-semibold">Predict Rating: </p>-->
                   <p id="movie-pred-label-${movie.film_id}" class="ml-1 text-gray-700"></p>
-                  <button id="movie-pred-btn-${movie.film_id}" class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ml-1 mb-1" type="button" onclick="ShowRating(${movie.film_id}, ${movie.rating.predict.toFixed(2)})">Show</button>
+                  <!--<button id="movie-pred-btn-${movie.film_id}" class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ml-1 mb-1" type="button" onclick="ShowRating(${movie.film_id}, ${movie.rating.predict.toFixed(2)})">Show</button>-->
               </div>
               <div class="py-2">
                   ${movie.genres.map((genre) => (

@@ -24,7 +24,7 @@
         <div class="w-1/2">
           <h1 class="text-3xl font-semibold text-gray-700">Register</h1>
           <br>
-          Pick min 3 films on the right, so recommendation engine will learn based on your interest.
+          <!-- Pick min 3 films on the right, so recommendation engine will learn based on your interest. -->
           <div class="flex flex-col mt-8"> 
             <label for="username" class="text-lg font-semibold text-gray-700">Username</label>
             <input type="username" name="username" id="username" placeholder="Username" class="border-2 border-gray-300 p-2 rounded-md mt-2 focus:outline-none focus:border-indigo-500">
@@ -40,7 +40,10 @@
         </div>
       </div>
 
-      <div id="moviesList" style="overflow-y: scroll;" class="grid grid-cols-3 items-center"></div>
+      <div>
+        <h1 class="flex mt-5" style="font-size: 25px;" >Pick min 3 films below, so recommendation engine will learn based on your interest.</h1>
+        <div id="moviesList" style="overflow-y: scroll;" class="grid grid-cols-3 items-center"></div>
+      </div>
     </div>
   </body>
 </html>

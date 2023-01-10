@@ -226,8 +226,8 @@ async function ApplyHistory() {
         </div>
         <p class="mt-3"> Genres: </p>
         ${
-          calculatedInterest.
-            map(gi => `<span class="inline-block bg-gray-200 rounded-full px-3 py-2 text-sm font-semibold text-blue-700 my-1 mx-1">${gi.genre}</span>`).
+         h.genres.split(',').
+            map(gi => `<span class="inline-block bg-gray-200 rounded-full px-3 py-2 text-sm font-semibold text-blue-700 my-1 mx-1">${gi}</span>`).
             join('')
         }
         <p class="text-gray-500 mt-3">${time_ago(new Date(nowDate.getTime() - diff))}</p>
@@ -306,8 +306,8 @@ async function ApplyLoginMovies() {
           }
         </div>
         <div class="flex items-center">
-          <input title="You will automatically give 4 rating to this film. Which indicate you like this film." id="checkbox-interest-${rec.film_id}" onchange="ToggleFilmInterest(${rec.film_id})" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-          <label title="You will automatically give 4 rating to this film. Which indicate you like this film." for="checked-checkbox" class="ml-2 text-sm font-medium text-gray-900">I Like it</label>
+          <input title="You will automatically give 5 rating to this film. Which indicate you like this film." id="checkbox-interest-${rec.film_id}" onchange="ToggleFilmInterest(${rec.film_id})" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+          <label title="You will automatically give 5 rating to this film. Which indicate you like this film." for="checked-checkbox" class="ml-2 text-sm font-medium text-gray-900">I Like it</label>
         </div>
 
         <div class="flex items-center">
@@ -390,6 +390,7 @@ function ShowName() {
    const e = document.getElementById('hi-username');
 
    const username = Cookies.get('username');
+   const userID = Cookies.get('user_id');
 
    e.innerText = `Hi ${username}!`;
 }
