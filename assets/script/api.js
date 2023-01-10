@@ -80,6 +80,7 @@ async function ApplyListFilm() {
               </div>
               <div class="flex flex-row items-center mt-2">
                   <p class="font-semibold">Relevancy: </p>
+                  <!-- TODO: ADD TOOLTIP ON HOVER TO CALCULATE SIMILARITY BETWEEN GENRE-->
                   <p class="ml-1 text-gray-700">${Number.isNaN(rev) ? '?' : rev}%</p>
               </div>
               <div class="flex flex-row items-center mt-2" id="div-rate-${movie.film_id}">
