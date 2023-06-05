@@ -1,20 +1,30 @@
-const baseURLAPI = 'http://localhost:5000';
+// const baseURL = 'http://127.0.0.1:5000';
+async function updateProgressBarV2(percentage) {
+    const progressBarID = document.getElementById('progress-bar');
+    progressBarID.style = `width: ${percentage}%`;
+}
+let itv;
+function RefreshRecommendation() {
+    ws.send('retrain');
+    document.getElementById('button-refresh').remove();
 
-async function updateProgressBar() {
-    await sleep(5000);
-    while (true) {
-        await sleep(100);
-        const triggerTrainResult = await TriggerTrain(true);
+    ShowProgressBar(true);
 
-        if (triggerTrainResult.data.percentage == 0) {
-            Cookies.set('action_count', 0);
-            window.location = '/';
+    itv = setInterval(CheckTrainProgress, 500);
+}
 
-            return;
+async function CheckTrainProgress() {
+    const result = await fetch(`${baseURL}/movies/train/progress`);
+    const data   = await result.json();
+
+    if (Array.isArray(data.data)) {
+        const v = JSON.parse(data.data[0]);
+        updateProgressBarV2(v.current / v.target * 100);
+
+        if (v.current == v.target) {
+            clearInterval(itv);
+            setTimeout(() => location.reload(), 2000);
         }
-    
-        const progressBarID = document.getElementById('progress-bar');
-        progressBarID.style = `width: ${triggerTrainResult.data.percentage * 100}%`;
     }
 }
 
@@ -22,29 +32,7 @@ async function ApplyListFilm() {
   const searchInput = document.getElementById('search-input');
   const searchInputValue = searchInput.value;
   const userID = Number.parseInt(Cookies.get('user_id'));
-  const actionCount = Number.parseInt(Cookies.get('action_count'));
-  const isFetchedTriggerTrain = Cookies.get('is-fetched-trigger-train') == 'true';
-
-  if (actionCount >= 3) {
-    ShowProgressBar(true);
-    if (!isFetchedTriggerTrain) {
-        TriggerTrain(false);
-
-        Cookies.set('is-fetched-trigger-train', 'true');
-
-        setTimeout(() => {
-            window.location = '/';
-        }, 1000);
-    }
-
-    await updateProgressBar();
-    return 
-  }
-
-  Cookies.remove('is-fetched-trigger-train');
-  ShowProgressBar(false);
-
-  const response = await fetch(`${baseURLAPI}/movies?${searchInputValue}`,
+  const response = await fetch(`${baseURL}/movies?${searchInputValue}`,
     {
         method: 'GET',
         headers: {
@@ -79,9 +67,9 @@ async function ApplyListFilm() {
                   <p class="ml-1 text-gray-700">${movie.rating.given || '-'}</p>-->
               </div>
               <div class="flex flex-row items-center mt-2">
-                  <p class="font-semibold">Relevancy: </p>
-                  <!-- TODO: ADD TOOLTIP ON HOVER TO CALCULATE SIMILARITY BETWEEN GENRE-->
-                  <p class="ml-1 text-gray-700">${Number.isNaN(rev) ? '?' : rev}%</p>
+                  <p class="font-semibold"></p>
+            
+                
               </div>
               <div class="flex flex-row items-center mt-2" id="div-rate-${movie.film_id}">
                   <!--<p class="font-semibold">Predict Rating: </p>-->

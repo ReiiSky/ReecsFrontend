@@ -1,6 +1,23 @@
-const baseURL = 'http://localhost:5000';
+const baseURL = 'http://127.0.0.1:5000';
+const WSbaseURL = 'ws://127.0.0.1:5001';
+const ws = new WebSocket(WSbaseURL);
+const needRetrained = 'need-retrain';
 
 let defaultRating = 0;
+
+ws.onmessage = (event) => {
+   try {
+      const parsedData = JSON.parse(event.data);
+      if (parsedData.event == 'reload') {
+         location.reload();
+      }
+   } catch (error) {
+      // console.log(error)
+   }
+}
+ws.onopen = () => {
+   console.log('opened')
+}
 
 function ShowRating(id, rating) {
    document.getElementById(`movie-pred-label-${id}`).innerText = rating != -1 ? rating : defaultRating;
@@ -10,12 +27,11 @@ function ShowRating(id, rating) {
    parent.removeChild(child);
 }
 
-
 function ShowProgressBar(activate) {
    const divProgressBar = document.getElementById('progress-bar-e');
 
    if (activate) {
-      divProgressBar.innerHTML = `<p class="text-[24px] font-semibold">Recommendation Engine still learning by your interests</p>
+      divProgressBar.innerHTML = `<p class="text-[24px] font-semibold">Personalizing</p>
     <div class="mt-2 w-1/4 h-6 bg-gray-200 rounded-full dark:bg-gray-700">
       <div id='progress-bar' class="h-6 bg-blue-600 rounded-full dark:bg-blue-500" style="width: 10%"></div>
     </div>`;
@@ -80,14 +96,13 @@ async function RegisterFn() {
 
    const interestLength = interestedFilm.length;
    const notInterestLength = notInterestedFilm.length;
-
-   if (interestLength + notInterestLength < 3) {
-      alert('please choose min 3 films');
+   const minFilm = 3;
+   if (interestLength + notInterestLength < minFilm) {
+      alert(`please choose min ${minFilm} films`);
       return;
    }
 
-   Cookies.remove('action_count');
-   IncrementOrResetRefreshRecommendationAction(interestLength + notInterestLength);
+   Cookies.remove(needRetrained);
 
    try {
       const result = await fetch(`${baseURL}/register`, {
@@ -111,6 +126,7 @@ async function RegisterFn() {
 
       Cookies.set('user_id', response.data.user_id);
       Cookies.set('username', usernameInput.value);
+      Cookies.set(needRetrained, true);
       window.location = '/index.html';
    } catch (error) {
       console.log(error);
@@ -140,7 +156,6 @@ async function CreateRating() {
          return;
       }
 
-      IncrementOrResetRefreshRecommendationAction();
       alert('success insert rating');
    } catch (error) {
       console.log(error);
@@ -165,18 +180,10 @@ async function DeleteHistory(filmID) {
       }
 
       alert('success delete rating');
-      IncrementOrResetRefreshRecommendationAction();
       window.location.reload();
    } catch (error) {
       console.log(error);
    }
-}
-
-function IncrementOrResetRefreshRecommendationAction(i = 1) {
-   let actionCount = Number.parseInt(Cookies.get('action_count'));
-   if (Number.isNaN(actionCount)) actionCount = 0;
-
-   Cookies.set('action_count', actionCount + i);
 }
 
 function Logout() {
@@ -210,7 +217,7 @@ async function ApplyHistory() {
          const nowDate = new Date();
          const ratingDate = new Date(h.created_at);
          const diff = nowDate.getTime() - ratingDate.getTime();
-         genreInterest.push(h.genres.split(','));
+         genreInterest.push(h.genres);
          const calculatedInterest = calculateInterest(genreInterest);
 
          historyHTML += `<div class="flex flex-row mt-3 p-2">
@@ -226,7 +233,7 @@ async function ApplyHistory() {
         </div>
         <p class="mt-3"> Genres: </p>
         ${
-         h.genres.split(',').
+         h.genres.
             map(gi => `<span class="inline-block bg-gray-200 rounded-full px-3 py-2 text-sm font-semibold text-blue-700 my-1 mx-1">${gi}</span>`).
             join('')
         }
@@ -292,7 +299,7 @@ async function ApplyLoginMovies() {
       </div>
       <div class="px-3 py-2 mx-auto">
         <div class="flex flex-row justify-between items-center">
-          <div id="title" class="font-bold text-xl">${rec.title}<span id="year">(${rec.release_date})</span>
+          <a onclick="MovieDetailRecDirect2(${rec.film_id})" class="font-bold text-xl">${rec.title} (${rec.release_date})</a>
           </div>
           <div class="flex flex-row items-center">
             <img src="assets/images/ic_star.svg" class="w-[16px] h-[16px]" alt="star">
@@ -406,56 +413,47 @@ async function MovieDetailRecDirect(id) {
    window.location = 'moviedetail';
 }
 
+async function MovieDetailRecDirect2(id) {
+   Cookies.set('selected_movie_id', id);
+
+   window.location = 'moviedetail-register';
+}
+
 
 async function ApplyMovieDetail() {
    const movieID = Cookies.get('selected_movie_id');
    const userID = Number.parseInt(Cookies.get('user_id'));
-
-
    const response = await fetch(`${baseURL}/movies/detail/${movieID}`, {
       method: 'GET',
       headers: {
-         'User-Id': userID,
+         'User-Id': Number.isNaN(userID) ? -1 : userID,
       },
    });
 
    const data = await response.json();
 
-
    if (data.data.rating.given) SelectStart(data.data.rating.given - 1);
    document.querySelector('#movieGenre').innerHTML = data.data.genres.join(', ');
-   document.querySelector('#movieTitle').innerHTML = data.data.title;
+   document.querySelector('#movieTitle').innerHTML = data.data.title + ` (${data.data.release_date})`;
    document.querySelector('#movieRatingReal').innerHTML = data.data.rating.real;
    document.querySelector('#movieDesc').innerHTML = data.data.description;
-   document.querySelector('#movieView').setAttribute('src', data.data.trailer_url);
-
-   defaultRating = data.data.rating.predict.toFixed(2);
-
-   const trailerURL = data.data.trailer_url;
-   const splited = trailerURL.split('/');
-
-   document.querySelector('#youtube-src').setAttribute('src', `https://www.youtube.com/embed/${splited[splited.length - 1]}`);
-
-   const recommendations = data.data.recommendations;
-
-   const html = recommendations.filter(dataR => dataR.film_id.toString() != movieID).map(dataR => {
-      return `
-      <div class="flex flex-row mt-3 p-2">
-      <div class="w-2/4 h-[160px]">
-          <div class="place-items-center rounded-md bg-cover w-full h-full" alt="${dataR.title}"
-           style="background-image: url(${dataR.image_url}); background-size: cover; background-position: center; background-repeat: no-repeat;"
-           ></div>
-      </div>
-      <div class="w-3/4 ml-6 flex flex-col justify-between">
-              <a onclick="MovieDetailRecDirect(${dataR.film_id})" class="font-bold text-xl">${dataR.title} <span>${dataR.release_date}</span></a>
-              <p class="mt-3 font-semibold">Description: <span class="text-gray-500 font-normal">${dataR.description}</span></p>
-              <p class="mt-3 font-semibold">Genres: <span class="text-gray-500 font-normal">${dataR.genres}</span></p>
-      </div>   
-  </div>
-      `;
+   // document.querySelector('#movieView').setAttribute('src', data.data.trailer_url);
+   document.querySelector('#director-names').innerHTML = (data.data.directors.map(d => d.name).slice(0.3).join(', '));
+   document.querySelector('#writer-names').innerHTML = (data.data.writers.map(d => d.name).slice(0, 3).join(', '));
+   document.querySelector('#cast-table').innerHTML = data.data.casters.map(caster => {
+      return `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+         ${caster.name}
+      </th>
+   </tr>`
    }).join('');
 
-   document.querySelector('#recomendation').insertAdjacentHTML('afterbegin', html);
+   defaultRating = data.data.rating.predict;
+
+   const trailerURL = data.data.trailer_url;
+
+   console.log(trailerURL);
+   document.querySelector('#youtube-src').setAttribute('src', trailerURL);
 }
 
 function SelectStart(id) {
@@ -538,10 +536,8 @@ async function TriggerTrain(percentageOnly = false) {
    });
 
    const data = await response.json();
-   console.log(data.data);
    return data;
 }
-
 setTimeout(() => {
    const fileselectorcsv = document.getElementById('file-selector-test');
    if (fileselectorcsv) {
