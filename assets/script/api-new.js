@@ -31,9 +31,9 @@ function ShowProgressBar(activate) {
    const divProgressBar = document.getElementById('progress-bar-e');
 
    if (activate) {
-      divProgressBar.innerHTML = `<p class="text-[24px] font-semibold">Personalizing</p>
+      divProgressBar.innerHTML = `<p class="text-[24px] font-semibold" id='personalization-label'>Personalizing...</p>
     <div class="mt-2 w-1/4 h-6 bg-gray-200 rounded-full dark:bg-gray-700">
-      <div id='progress-bar' class="h-6 bg-blue-600 rounded-full dark:bg-blue-500" style="width: 10%"></div>
+      <div id='progress-bar' class="h-6 bg-blue-600 rounded-full dark:bg-blue-500" style="width: 0%"></div>
     </div>`;
    } else {
       divProgressBar.innerHTML = '';
@@ -96,7 +96,7 @@ async function RegisterFn() {
 
    const interestLength = interestedFilm.length;
    const notInterestLength = notInterestedFilm.length;
-   const minFilm = 3;
+   const minFilm = 8;
    if (interestLength + notInterestLength < minFilm) {
       alert(`please choose min ${minFilm} films`);
       return;
@@ -157,6 +157,7 @@ async function CreateRating() {
       }
 
       alert('success insert rating');
+      window.location = '/';
    } catch (error) {
       console.log(error);
    }
@@ -218,9 +219,8 @@ async function ApplyHistory() {
          const ratingDate = new Date(h.created_at);
          const diff = nowDate.getTime() - ratingDate.getTime();
          genreInterest.push(h.genres);
-         const calculatedInterest = calculateInterest(genreInterest);
 
-         historyHTML += `<div class="flex flex-row mt-3 p-2">
+         historyHTML = `<div class="flex flex-row mt-3 p-2">
       <div class="w-1/4 h-[240]">
         <div class="place-items-center rounded-md bg-cover w-full h-full" alt="${h.title}" style="background-image: url(${h.image_url})"></div>
       </div>
@@ -240,7 +240,7 @@ async function ApplyHistory() {
         <p class="text-gray-500 mt-3">${time_ago(new Date(nowDate.getTime() - diff))}</p>
         <button class="w-[174px] bg-red-700 py-2 text-white rounded-md mt-3" onclick="DeleteHistory(${h.film_id})">Delete</button>
       </div>
-    </div>`;
+    </div>` + historyHTML;
       }
 
       e.innerHTML = historyHTML;
@@ -440,19 +440,30 @@ async function ApplyMovieDetail() {
    // document.querySelector('#movieView').setAttribute('src', data.data.trailer_url);
    document.querySelector('#director-names').innerHTML = (data.data.directors.map(d => d.name).slice(0.3).join(', '));
    document.querySelector('#writer-names').innerHTML = (data.data.writers.map(d => d.name).slice(0, 3).join(', '));
-   document.querySelector('#cast-table').innerHTML = data.data.casters.map(caster => {
-      return `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-      <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-         ${caster.name}
-      </th>
-   </tr>`
+
+   let casts = [[]];
+
+   for (let i = 0; i< data.data.casters.length; ++i) {
+      const cast = data.data.casters[i];
+
+      if (i % 2 == 0) {
+         casts[Number.parseInt(i / 2)].push(cast);
+      } else {
+         casts[Number.parseInt(i / 2)].push(cast);
+         if (i + 1 == data.data.casters.length) continue;
+         casts.push([]);
+      }
+   }
+
+   document.querySelector('#cast-table').innerHTML = casts.map(casters => {
+      return `<tr>
+      ${casters.map(caster => `<td class="border px-4 py-2">${caster.name}</td>`).join('')}
+    </tr>`
    }).join('');
 
    defaultRating = data.data.rating.predict;
 
    const trailerURL = data.data.trailer_url;
-
-   console.log(trailerURL);
    document.querySelector('#youtube-src').setAttribute('src', trailerURL);
 }
 

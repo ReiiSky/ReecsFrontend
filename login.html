@@ -21,16 +21,16 @@
           <h1 class="text-3xl font-semibold text-gray-700">Login</h1>
           <div class="flex flex-col mt-8">
             <label for="username" class="text-lg font-semibold text-gray-700">Username</label>
-            <input type="username" name="username" id="username" placeholder="Username" class="border-2 border-gray-300 p-2 rounded-md mt-2 focus:outline-none focus:border-indigo-500">
+            <input type="username" name="username" id="username" autocomplete="off" placeholder="Username" class="border-2 border-gray-300 p-2 rounded-md mt-2 focus:outline-none focus:border-indigo-500">
           </div>
           <div class="flex flex-col mt-3">
             <label for="password" class="text-lg font-semibold text-gray-700">Password</label>
-            <input type="password" name="password" id="password" placeholder="Password" class="border-2 border-gray-300 p-2 rounded-lg mt-2 focus:outline-none focus:border-indigo-500">
+            <input type="password" autocomplete="off" name="password" id="password" placeholder="Password" class="border-2 border-gray-300 p-2 rounded-lg mt-2 focus:outline-none focus:border-indigo-500">
           </div>
 
           <div class="flex flex-col mt-6">
             <a href="/register" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Register Here</a>
-            <input onclick="LoginFn()" type="submit" value="Login" class="bg-blue-700 text-white p-2 rounded-md cursor-pointer">
+            <input onclick="LoginFn()" type="submit" value="Login" class="bg-blue-700 text-white p-2 rounded-md cursor-pointer" autocomplete="off">
           </div>
         </div>
       </div>

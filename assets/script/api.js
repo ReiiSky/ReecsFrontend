@@ -13,6 +13,13 @@ function RefreshRecommendation() {
     itv = setInterval(CheckTrainProgress, 500);
 }
 
+function homeFn() {
+    if (Cookies.get(needRetrained)) {
+        Cookies.remove(needRetrained);
+        RefreshRecommendation();
+    }
+}
+
 async function CheckTrainProgress() {
     const result = await fetch(`${baseURL}/movies/train/progress`);
     const data   = await result.json();
@@ -45,7 +52,10 @@ async function ApplyListFilm() {
 
   const movies = data.data.recommendations;
   const html = movies.map(movie => {
-    const rev = Number.parseInt(movie.relevancy * 100);
+    if (movie.rating.given > 0) {
+        return;
+    }
+
     return `
       <div class="w-4/5 max-w-xs rounded-lg border-solid border-2 shadow-md my-3 p-2">
           <div class="h-[360px] overflow-hidden"  alt="${movie.title}">
@@ -71,10 +81,12 @@ async function ApplyListFilm() {
             
                 
               </div>
-              <div class="flex flex-row items-center mt-2" id="div-rate-${movie.film_id}">
-                  <!--<p class="font-semibold">Predict Rating: </p>-->
-                  <p id="movie-pred-label-${movie.film_id}" class="ml-1 text-gray-700"></p>
-                  <!--<button id="movie-pred-btn-${movie.film_id}" class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ml-1 mb-1" type="button" onclick="ShowRating(${movie.film_id}, ${movie.rating.predict.toFixed(2)})">Show</button>-->
+              <div class="flex flex-row items-center mt-2" id="div-rate-${movie.id}">
+                  <p class="font-semibold mr-1">Rating Prediction: </p>
+                  <img src="assets/images/ic_star.svg" class="w-[16px] h-[16px]" alt="star">
+                  <p class="text-gray-700">${movie.rating.predict || '-'}</p>
+                  <p id="movie-pred-label-${movie.id}" class="ml-1 text-gray-700"></p>
+                  <!--<button id="movie-pred-btn-${movie.id}" class="bg-blue-500 text-white active:bg-blue-600 font-bold uppercase text-xs px-1 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none ml-1 mb-1" type="button" onclick="ShowRating(${movie.film_id}, ${movie.rating.predict})">Show</button>-->
               </div>
               <div class="py-2">
                   ${movie.genres.map((genre) => (
@@ -87,7 +99,7 @@ async function ApplyListFilm() {
           </div>
         </div>
       `;
-  }).join('');
+  }).filter(m => typeof m === 'string').join('');
 
   const movieList = document.querySelector('#moviesList');
   if (movieList) movieList.innerHTML = html;
