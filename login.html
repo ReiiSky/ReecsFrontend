@@ -13,6 +13,12 @@
     <script src="assets/script/tailwind-config.js"></script>
     <script src="assets/script/api-new.js"></script>
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+    <script>
+      setTimeout(() => {
+        ApplyShowCaseMovie();
+        setInterval(ApplyShowCaseMovie, 4000);
+      }, 500);
+    </script>
   </head>
   <body class="font-poppins">
     <div class="flex flex-row h-screen">
@@ -33,6 +39,9 @@
             <input onclick="LoginFn()" type="submit" value="Login" class="bg-blue-700 text-white p-2 rounded-md cursor-pointer" autocomplete="off">
           </div>
         </div>
+      </div>
+      <div>
+        <div id="moviesList" style="overflow-y: scroll; margin-top: 150px;" class="grid grid-cols-3 items-center"></div>
       </div>
     </div>
   </body>

@@ -17,8 +17,10 @@
       setTimeout(ResetSelectedMovieID, 800);
       setTimeout(DirectOnGuest, 800);
       setTimeout(ShowName, 800);
-      setTimeout(ApplyListFilm, 800);
       setTimeout(homeFn, 1000);
+    </script>
+
+    <script>
     </script>
     <script src="assets/script/tailwind-config.js"></script>
   </head>
@@ -49,11 +51,28 @@
     </nav>
     <div class="ml-12">
       <p class="text-[32px] font-semibold">Rate min 6 films, before refresh recommendations.</p>
-      <button onclick="RefreshRecommendation()" id="button-refresh" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <button onclick="RefreshRecommendation()" id="button-refresh" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         Refresh
       </button>
+      
+      <div class="flex mt-3">
+        <div class="flex items-center mr-4">
+            <input onclick="ApplyListFilm()" checked id="inline-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="inline-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Default</label>
+        </div>
+        <div class="flex items-center mr-4">
+            <input onclick="ApplyListFilm()" id="inline-2-radio" type="radio" value="" name="inline-radio-group" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+            <label for="inline-2-radio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Sort By Relevancy</label>
+        </div>
+      </div>
+
       <div id="progress-bar-e"></div>
       <div id="moviesList" class="grid grid-cols-4 items-center"></div>
     </div>
+    <script>
+      if (document.getElementById('inline-radio').checked) {
+        setTimeout(ApplyListFilm, 800);
+      }
+    </script>
   </body>
 </html>

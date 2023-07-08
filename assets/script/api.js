@@ -39,11 +39,14 @@ async function ApplyListFilm() {
   const searchInput = document.getElementById('search-input');
   const searchInputValue = searchInput.value;
   const userID = Number.parseInt(Cookies.get('user_id'));
+  const isRecommended = document.getElementById('inline-radio').checked;
+
   const response = await fetch(`${baseURL}/movies?${searchInputValue}`,
     {
         method: 'GET',
         headers: {
             'User-Id': userID,
+            'Is-Recommended': `${isRecommended}`,
         },
     }
   );

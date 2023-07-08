@@ -1,5 +1,9 @@
+// const baseURL = 'http://127.0.0.1:5000';
+// const WSbaseURL = 'ws://127.0.0.1:5001';
+
 const baseURL = 'http://127.0.0.1:5000';
 const WSbaseURL = 'ws://127.0.0.1:5001';
+
 const ws = new WebSocket(WSbaseURL);
 const needRetrained = 'need-retrain';
 
@@ -279,6 +283,52 @@ function calculateInterest(interestPerFilm) {
    }));
 }
 
+async function ApplyShowCaseMovie() {
+   try {
+      const result = await fetch(`${baseURL}/login/movies`);
+
+      const response = await result.json();
+      if (response.status == 'failed') {
+         alert(response.message);
+         return;
+      }
+
+      const recommendations = response.data.recommendations;
+      const e = document.getElementById('moviesList');
+      e.innerHTML = '';
+
+      for (const rec of recommendations.slice(0, 3)) {
+         e.innerHTML += `<div class="w-5/6 max-w-xs rounded-lg border-solid border-2 shadow-md my-3 p-2">
+      <div class="h-[360px] overflow-hidden" alt="${rec.title}">
+        <div class="place-items-center w-full h-full" alt=${rec.title} style="background-image: url(${rec.image_url}); background-size: cover; background-position: center; background-repeat: no-repeat;"></div>
+      </div>
+      <div class="px-3 py-2 mx-auto">
+        <div class="flex flex-row justify-between items-center">
+          <a onclick="MovieDetailRecDirect2(${rec.film_id})" class="font-bold text-xl">${rec.title} (${rec.release_date})</a>
+          </div>
+          <div class="flex flex-row items-center">
+            <img src="assets/images/ic_star.svg" class="w-[16px] h-[16px]" alt="star">
+            <p class="ml-1 mr-1">${rec.rating.real}</p>
+          </div>
+        </div>
+        <div class="py-2">
+          ${
+            rec.genres.map(g => `<span class="inline-block bg-gray-200 rounded-full px-3 py-2 text-sm font-semibold text-blue-700 my-1 mx-1">${g}</span>`).
+            join('')
+          }
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+    </div>`;
+      }
+   } catch (error) {
+      console.log(error);
+   }
+}
+
 async function ApplyLoginMovies() {
    try {
       const result = await fetch(`${baseURL}/login/movies`);
@@ -323,9 +373,6 @@ async function ApplyLoginMovies() {
       </div>
     </div>`;
       }
-
-      // <input title="You will automatically give 2 rating to this film. Which indicate you don't really like this film." id="checkbox-not-interest-${rec.film_id}" onchange="ToggleFilmNotInterest(${rec.film_id})" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-      // <label title="You will automatically give 2 rating to this film. Which indicate you don't really like this film." for="checked-checkbox" class="ml-2 text-sm font-medium text-gray-900">I Don't Really Like it</label>
    } catch (error) {
       console.log(error);
    }
